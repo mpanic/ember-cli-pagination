@@ -23,6 +23,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   contentUpdated: 0,
 
   init: function() {
+    debugger;
     this._super(...arguments);
 
     var initCallback = this.get('initCallback');
@@ -44,6 +45,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
       this.get('promise');
     }
     catch (e) {
+      console.log('PagedRemoteArray promise exception', e.message);
       this.set('promise', this.fetchContent());
     }
   },
