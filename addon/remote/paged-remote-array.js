@@ -17,7 +17,8 @@ var ArrayProxyPromiseMixin = Ember.Mixin.create(Ember.PromiseProxyMixin, {
   }
 });
 
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
