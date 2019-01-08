@@ -3,8 +3,9 @@ import Util from 'ember-cli-pagination/util';
 import LockToRange from 'ember-cli-pagination/watch/lock-to-range';
 import { QueryParamsForBackend, ChangeMeta } from './mapping';
 import PageMixin from '../page-mixin';
+import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';
 
-var ArrayProxyPromiseMixin = Ember.Mixin.create(Ember.PromiseProxyMixin, {
+var ArrayProxyPromiseMixin = Ember.Mixin.create(PromiseProxyMixin, {
   then: function(success,failure) {
     debugger;
     var promise = this.get('promise');
@@ -16,21 +17,31 @@ var ArrayProxyPromiseMixin = Ember.Mixin.create(Ember.PromiseProxyMixin, {
     }, failure);
   }
 });
-var ArrayProxyPromiseMixin2 = Ember.Mixin.create(Ember.PromiseProxyMixin, {
+var ArrayProxyPromiseMixin2 = Ember.Mixin.create(PromiseProxyMixin, {
+  // then: function(success,failure) {
+  //   debugger;
+  //   var promise = this.get('promise');
+  //   var me = this;
+
+  //   // return promise.then(function() {
+  //   //   debugger;
+  //   //   return success(me);
+  //   // }, failure);
+  //   return promise;
+  // }
   then: function(success,failure) {
     debugger;
     var promise = this.get('promise');
     var me = this;
 
-    // return promise.then(function() {
-    //   debugger;
-    //   return success(me);
-    // }, failure);
-    return promise;
+    return promise.then(function() {
+      debugger;
+      return success(me);
+    }, failure);
   }
 });
 
-// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
   export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
   page: 1,
@@ -127,7 +138,7 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(Ember.PromiseProxyMixin, {
     return rez;
   },
 
-  async fetchContent() {
+  async NEW_fetchContent() {
     this.set("loading", true);
     var rows = await this.rawFindFromStore();
     this.incrementProperty("numRemoteCalls");
@@ -147,6 +158,29 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(Ember.PromiseProxyMixin, {
     me.set("loading", false);
 
     return rows;
+  },
+
+  async fetchContent() {
+    this.set("loading",true);
+    var res = await this.rawFindFromStore();
+    this.incrementProperty("numRemoteCalls");
+    var me = this;
+
+    res.then(function(rows) {
+      var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
+                                       meta: rows.meta,
+                                       page: me.getPage(),
+                                       perPage: me.getPerPage()});
+
+      me.set("loading",false);
+      return me.set("meta", metaObj.make());
+
+    }, function(error) {
+      Util.log("PagedRemoteArray#fetchContent error " + error);
+      me.set("loading",false);
+    });
+
+    return res;
   },
 
   totalPages: Ember.computed.alias("meta.total_pages"),
