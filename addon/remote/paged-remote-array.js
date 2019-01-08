@@ -89,6 +89,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   }),
 
   rawFindFromStore: function() {
+    debugger;
     var store = this.get('store');
     var modelName = this.get('modelName');
 
@@ -105,6 +106,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     var me = this;
 
     res.then(function(rows) {
+      debugger;
       var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
                                        meta: rows.meta,
                                        page: me.getPage(),
@@ -114,7 +116,8 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
       return me.set("meta", metaObj.make());
 
     }, function(error) {
-      Util.log("PagedRemoteArray#fetchContent error " + error);
+      // Util.log("PagedRemoteArray#fetchContent error " + error);
+      console.log("PagedRemoteArray#fetchContent error: ", error);
       me.set("loading",false);
     });
 
