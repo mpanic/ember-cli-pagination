@@ -6,15 +6,15 @@ export default Ember.Mixin.create({
   perPage: 10,
   startingPage: 1,
 
-  async model(params) {
-    let routeName;
-    try {
-      routeName = this.get('routeName');
-    } catch (ex) {
-      console.log('error getting route name', ex.message);
-    }
-    return await this.findPaged(this._findModelName(routeName), params);
-  },
+  // async model(params) {
+  //   let routeName;
+  //   try {
+  //     routeName = this.get('routeName');
+  //   } catch (ex) {
+  //     console.log('error getting route name', ex.message);
+  //   }
+  //   return await this.findPaged(this._findModelName(routeName), params);
+  // },
 
   _findModelName: function(routeName) {
     let modelName;
