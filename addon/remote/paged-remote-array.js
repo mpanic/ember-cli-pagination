@@ -6,10 +6,12 @@ import PageMixin from '../page-mixin';
 
 var ArrayProxyPromiseMixin = Ember.Mixin.create(Ember.PromiseProxyMixin, {
   then: function(success,failure) {
+    debugger;
     var promise = this.get('promise');
     var me = this;
 
     return promise.then(function() {
+      debugger;
       return success(me);
     }, failure);
   }
