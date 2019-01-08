@@ -35,10 +35,15 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(PromiseProxyMixin, {
     var promise = this.get('promise');
     var me = this;
 
-    return promise.then(function() {
-      debugger;
+    // return promise.then(function() {
+    //   debugger;
+    //   return success(me);
+    // }, failure);
+    if (promise._result.isLoaded) {
       return success(me);
-    }, failure);
+    } else {
+      console.log('not')
+    }
   }
 });
 
