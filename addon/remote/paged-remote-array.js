@@ -16,9 +16,23 @@ var ArrayProxyPromiseMixin = Ember.Mixin.create(Ember.PromiseProxyMixin, {
     }, failure);
   }
 });
+var ArrayProxyPromiseMixin2 = Ember.Mixin.create(Ember.PromiseProxyMixin, {
+  then: function(success,failure) {
+    debugger;
+    var promise = this.get('promise');
+    var me = this;
+
+    // return promise.then(function() {
+    //   debugger;
+    //   return success(me);
+    // }, failure);
+    return promise;
+  }
+});
 
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
+  export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
@@ -108,7 +122,9 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
     var modelName = this.get('modelName');
 
     var ops = this.get('paramsForBackend');
-    return await store.query(modelName, Object.assign({},ops)); // always create a shallow copy of `ops` in case adapter would mutate the original object
+    let rez = await store.query(modelName, Object.assign({}, ops)); // always create a shallow copy of `ops` in case adapter would mutate the original object
+    debugger;
+    return rez;
   },
 
   async fetchContent() {
@@ -127,8 +143,8 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
     } catch(ex) {
       // Util.log("PagedRemoteArray#fetchContent error " + error);
       console.log("PagedRemoteArray#fetchContent error: ", ex.message);
-      me.set("loading", false);
     }
+    me.set("loading", false);
 
     return rows;
   },
