@@ -75,7 +75,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     }
     catch (e) {
       console.log('PagedRemoteArray promise exception', e.message);
-      this.set('promise', await this.fetchContent());
+      this.set('promise', this.fetchContent());
     }
   },
 
@@ -139,7 +139,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return rez;
   },
 
-  async fetchContent() {
+  fetchContent() {
     var me = this;
     return new Promise(async function(resolve, reject) {
       me.set("loading", true);
@@ -197,7 +197,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     var lastPage = this.get('lastPage');
     if (lastPage != page) {
       this.set('lastPage', page);
-      this.set("promise", await this.fetchContent());
+      this.set("promise", this.fetchContent());
     }
   }),
 
@@ -220,7 +220,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   }),
 
   async reload() {
-    var promise = await this.fetchContent();
+    var promise = this.fetchContent();
     this.set('promise', promise);
     return promise;
   },
