@@ -4,6 +4,7 @@ import LockToRange from 'ember-cli-pagination/watch/lock-to-range';
 import { QueryParamsForBackend, ChangeMeta } from './mapping';
 import PageMixin from '../page-mixin';
 import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';
+import RSVP from 'rsvp';
 
 var ArrayProxyPromiseMixin = Ember.Mixin.create(PromiseProxyMixin, {
   then: function(success,failure) {
@@ -138,29 +139,32 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return rez;
   },
 
-  async NEW_fetchContent() {
-    this.set("loading", true);
-    var rows = await this.rawFindFromStore();
-    this.incrementProperty("numRemoteCalls");
-    var me = this;
-    try {
-      var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
-                                       meta: rows.meta,
-                                       page: me.getPage(),
-                                       perPage: me.getPerPage()});
+  async fetchContent() {
+    return new Promise(function(resolve, reject) {
+      this.set("loading", true);
+      var rows;
+      try {
+        rows = await this.rawFindFromStore();
+        this.incrementProperty("numRemoteCalls");
+        var me = this;
+      
+        var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
+                                         meta: rows.meta,
+                                         page: me.getPage(),
+                                         perPage: me.getPerPage()});
 
-      me.set("loading",false);
-      me.set("meta", metaObj.make());
-    } catch(ex) {
-      // Util.log("PagedRemoteArray#fetchContent error " + error);
-      console.log("PagedRemoteArray#fetchContent error: ", ex.message);
-    }
-    me.set("loading", false);
-
-    return rows;
+        me.set("loading",false);
+        me.set("meta", metaObj.make());
+        resolve(rows);
+      } catch(ex) {
+        // Util.log("PagedRemoteArray#fetchContent error " + error);
+        console.log("PagedRemoteArray#fetchContent error: ", ex.message);
+        reject("PagedRemoteArray#fetchContent error: " + ex.message);
+      }
+    });
   },
 
-  async fetchContent() {
+  async OLD_fetchContent() {
     this.set("loading",true);
     var res = await this.rawFindFromStore();
     this.incrementProperty("numRemoteCalls");
