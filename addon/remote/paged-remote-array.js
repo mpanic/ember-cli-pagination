@@ -140,7 +140,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   },
 
   async fetchContent() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(async function(resolve, reject) {
       this.set("loading", true);
       var rows;
       try {
