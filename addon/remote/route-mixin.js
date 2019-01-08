@@ -48,6 +48,6 @@ export default Ember.Mixin.create({
 
     mainOps.initCallback = callback;
 
-    return PagedRemoteArray.create(mainOps);
+    return await PagedRemoteArray.create(mainOps);
   }
 });
