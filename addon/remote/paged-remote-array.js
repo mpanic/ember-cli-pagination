@@ -140,13 +140,14 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   },
 
   async fetchContent() {
+    var me = this;
     return new Promise(async function(resolve, reject) {
-      this.set("loading", true);
+      me.set("loading", true);
       var rows;
       try {
-        rows = await this.rawFindFromStore();
-        this.incrementProperty("numRemoteCalls");
-        var me = this;
+        rows = await me.rawFindFromStore();
+        me.incrementProperty("numRemoteCalls");
+        
       
         var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
                                          meta: rows.meta,
