@@ -39,17 +39,20 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(PromiseProxyMixin, {
     //   debugger;
     //   return success(me);
     // }, failure);
-    if (promise._result.isLoaded) {
-      return success(me);
-    } else {
-      console.log('not')
+    if (typeof promise._result != 'undefined') {
+      if (promise._result.isLoaded) {
+        return success(me);
+      } else {
+        console.log('not')
+        reject('error loading promise');
+      }
     }
   }
 });
 
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
-// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
