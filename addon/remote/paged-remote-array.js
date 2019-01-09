@@ -50,9 +50,9 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(PromiseProxyMixin, {
   }
 });
 
-// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
@@ -79,7 +79,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     });
 
     try {
-      this.get('promise');
+      return this.get('promise');
     }
     catch (e) {
       console.log('PagedRemoteArray promise exception', e.message);
