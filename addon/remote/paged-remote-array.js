@@ -44,15 +44,36 @@ var ArrayProxyPromiseMixin2 = Ember.Mixin.create(PromiseProxyMixin, {
         return success(me);
       } else {
         console.log('not')
-        reject('error loading promise');
+        return reject('error loading promise');
       }
     }
   }
 });
+var ArrayProxyPromiseMixin3 = Ember.Mixin.create(PromiseProxyMixin, {
+  then: function(success,failure) {
+    var content = Ember.A(this.get('content'));
+    var me = this;
+    var promise;
 
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+    if (content.then) {
+      promise = content.then(function() {
+        return success(me);
+      },failure);
+    }
+    else {
+      promise = new Ember.RSVP.Promise(function(resolve) {
+        resolve(success(me));
+      });
+    }
+
+    return promise;
+  }
+});
+
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin3, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
@@ -83,7 +104,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     }
     catch (e) {
       console.log('PagedRemoteArray promise exception', e.message);
-      this.set('promise', this.fetchContent());
+      return this.set('promise', this.fetchContent());
     }
   },
 
