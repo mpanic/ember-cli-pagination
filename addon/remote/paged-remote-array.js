@@ -61,7 +61,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
 
   async init() {
     debugger;
-    this._super(...arguments);
+    // this._super(...arguments);
 
     var initCallback = this.get('initCallback');
     if (initCallback) {
