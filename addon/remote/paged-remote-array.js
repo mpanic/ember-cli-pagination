@@ -122,7 +122,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return ops;
   }),
 
-  OLD_rawFindFromStore: function() {
+  OLD1_rawFindFromStore: function() {
     debugger;
     var store = this.get('store');
     var modelName = this.get('modelName');
@@ -133,7 +133,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return res;
   },
 
-  async rawFindFromStore() {
+  async OLD2_rawFindFromStore() {
     debugger;
     var store = this.get('store');
     var modelName = this.get('modelName');
@@ -144,7 +144,18 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return rez;
   },
 
-  fetchContent() {
+  rawFindFromStore() {
+    debugger;
+    var store = this.get('store');
+    var modelName = this.get('modelName');
+
+    var ops = this.get('paramsForBackend');
+    let rez = store.query(modelName, Object.assign({}, ops)); // always create a shallow copy of `ops` in case adapter would mutate the original object
+    debugger;
+    return rez;
+  },
+
+  OLD2_fetchContent() {
     var me = this;
     return new Promise(async function(resolve, reject) {
       me.set("loading", true);
@@ -170,7 +181,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     });
   },
 
-  async OLD_fetchContent() {
+  async OLD1_fetchContent() {
     this.set("loading",true);
     var res = await this.rawFindFromStore();
     this.incrementProperty("numRemoteCalls");
@@ -189,6 +200,35 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
       Util.log("PagedRemoteArray#fetchContent error " + error);
       me.set("loading",false);
     });
+
+    return res;
+  },
+
+  fetchContent() {
+    this.set("loading",true);
+    debugger;
+    var res = this.rawFindFromStore();
+    this.incrementProperty("numRemoteCalls");
+    var me = this;
+
+    res.then(
+      function(rows) {
+        debugger;
+        var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
+                                         meta: rows.meta,
+                                         page: me.getPage(),
+                                         perPage: me.getPerPage()});
+
+        me.set("loading",false);
+        return me.set("meta", metaObj.make());
+      }, 
+      function(error) {
+        debugger;
+        // Util.log("PagedRemoteArray#fetchContent error " + error);
+        console.log("PagedRemoteArray#fetchContent error ", error);
+        me.set("loading",false);
+      }
+    );
 
     return res;
   },
