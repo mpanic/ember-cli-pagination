@@ -58,11 +58,24 @@ var ArrayProxyPromiseMixin3 = Ember.Mixin.create(PromiseProxyMixin, {
     return promise;
   }
 });
+var ArrayProxyPromiseMixin4 = Ember.Mixin.create(PromiseProxyMixin, {
+  then: function(success,failure) {
+    debugger;
+    var promise = this.get('promise.promise');
+    var me = this;
 
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+    return promise.then(function() {
+      debugger;
+      return success(me);
+    }, failure);
+  }
+});
+
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin3, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin4, {
   page: 1,
   paramMapping: Ember.computed(() => {
     return {};
