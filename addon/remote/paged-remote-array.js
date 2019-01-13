@@ -61,7 +61,7 @@ var ArrayProxyPromiseMixin3 = Ember.Mixin.create(PromiseProxyMixin, {
       },failure);
     }
     else {
-      promise = new Ember.RSVP.Promise(function(resolve) {
+      promise = new RSVP.Promise(function(resolve) {
         resolve(success(me));
       });
     }
@@ -100,11 +100,11 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     });
 
     try {
-      return this.get('promise');
+      return await this.get('promise');
     }
     catch (e) {
       console.log('PagedRemoteArray promise exception', e.message);
-      return this.set('promise', this.fetchContent());
+      return await this.set('promise', this.fetchContent());
     }
   },
 
