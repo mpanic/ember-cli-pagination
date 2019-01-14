@@ -217,7 +217,6 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
   },
 
   async rawFindFromStore() {
-    debugger;
     var store = this.get('store');
     var modelName = this.get('modelName');
 

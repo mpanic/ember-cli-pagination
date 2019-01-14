@@ -29,7 +29,6 @@ export default Ember.Mixin.create({
   },
 
   async findPaged(name, params, options, callback) {
-    debugger;
     var opt = options || {};
     var mainOps = {
       page: params.page || this.get('startingPage'),
