@@ -71,8 +71,8 @@ var ArrayProxyPromiseMixin4 = Ember.Mixin.create(PromiseProxyMixin, {
   }
 });
 
-// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
-export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
+export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
+// export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin2, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin3, {
 // export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromiseMixin4, {
@@ -82,7 +82,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   }),
   contentUpdated: 0,
 
-  async init() {
+  async OLD_init() {
     // debugger;
     this._super(...arguments);
 
@@ -119,6 +119,32 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     }
   },
 
+  async init() {
+    this._super(...arguments);
+
+    var initCallback = this.get('initCallback');
+    if (initCallback) {
+      initCallback(this);
+    }
+
+    this.addArrayObserver({
+      arrayWillChange(me) {
+        me.trigger('contentWillChange');
+      },
+      arrayDidChange(me) {
+        me.incrementProperty('contentUpdated');
+        me.trigger('contentUpdated');
+      },
+    });
+
+    try {
+      let content = await this.fetchContent();
+      return content;
+    }
+    catch (e) {
+      console.log('PagedRemoteArray promise exception', e.message);
+    }
+  },
   addParamMapping: function(key,mappedKey,mappingFunc) {
     var paramMapping = this.get('paramMapping') || {};
     if (mappingFunc) {
@@ -179,7 +205,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return rez;
   },
 
-  rawFindFromStore() {
+  OLD3_rawFindFromStore() {
     debugger;
     var store = this.get('store');
     var modelName = this.get('modelName');
@@ -187,6 +213,16 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     var ops = this.get('paramsForBackend');
     let rez = store.query(modelName, Object.assign({}, ops)); // always create a shallow copy of `ops` in case adapter would mutate the original object
     debugger;
+    return rez;
+  },
+
+  async rawFindFromStore() {
+    debugger;
+    var store = this.get('store');
+    var modelName = this.get('modelName');
+
+    var ops = this.get('paramsForBackend');
+    let rez = wait store.query(modelName, Object.assign({}, ops));
     return rez;
   },
 
@@ -267,15 +303,13 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
 
     return res;
   },
-  fetchContent() {
+  async OLD3_fetchContent() {
     this.set("loading",true);
-    debugger;
     var res = this.rawFindFromStore();
     this.incrementProperty("numRemoteCalls");
     var me = this;
 
     return res.then((rows) => {
-        debugger;
         var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
                                          meta: rows.meta,
                                          page: me.getPage(),
@@ -291,6 +325,30 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
         me.set("loading",false);
       }
     );
+  },
+  async fetchContent() {
+    this.set("loading",true);
+    var res = await this.rawFindFromStore();
+    this.incrementProperty("numRemoteCalls");
+    var me = this;
+
+    // return res.then((rows) => {
+    //     var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
+    //                                      meta: rows.meta,
+    //                                      page: me.getPage(),
+    //                                      perPage: me.getPerPage()});
+
+    //     me.set("loading",false);
+    //     return me.set("meta", metaObj.make());
+    //   }, 
+    //   (error) => {
+    //     debugger;
+    //     // Util.log("PagedRemoteArray#fetchContent error " + error);
+    //     console.log("PagedRemoteArray#fetchContent error ", error);
+    //     me.set("loading",false);
+    //   }
+    // );
+    return res;
   },
 
   totalPages: Ember.computed.alias("meta.total_pages"),
@@ -325,6 +383,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
   }),
 
   async reload() {
+    debugger;
     var promise = this.fetchContent();
     this.set('promise', promise);
     return promise;
