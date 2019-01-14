@@ -222,7 +222,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, {
     var modelName = this.get('modelName');
 
     var ops = this.get('paramsForBackend');
-    let rez = wait store.query(modelName, Object.assign({}, ops));
+    let rez = await store.query(modelName, Object.assign({}, ops));
     return rez;
   },
 
