@@ -239,7 +239,7 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     return res;
   },
 
-  fetchContent() {
+  OLD2_fetchContent() {
     this.set("loading",true);
     debugger;
     var res = this.rawFindFromStore();
@@ -266,6 +266,31 @@ export default Ember.ArrayProxy.extend(PageMixin, Ember.Evented, ArrayProxyPromi
     );
 
     return res;
+  },
+  fetchContent() {
+    this.set("loading",true);
+    debugger;
+    var res = this.rawFindFromStore();
+    this.incrementProperty("numRemoteCalls");
+    var me = this;
+
+    return res.then((rows) => {
+        debugger;
+        var metaObj = ChangeMeta.create({paramMapping: me.get('paramMapping'),
+                                         meta: rows.meta,
+                                         page: me.getPage(),
+                                         perPage: me.getPerPage()});
+
+        me.set("loading",false);
+        return me.set("meta", metaObj.make());
+      }, 
+      (error) => {
+        debugger;
+        // Util.log("PagedRemoteArray#fetchContent error " + error);
+        console.log("PagedRemoteArray#fetchContent error ", error);
+        me.set("loading",false);
+      }
+    );
   },
 
   totalPages: Ember.computed.alias("meta.total_pages"),
